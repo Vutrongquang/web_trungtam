@@ -16,6 +16,10 @@ class Course(Document):
     content = StringField()
     price = FloatField()
 
+class Account(Document):
+    username = StringField()
+    password = StringField()
+
 # course1 = Course(image = "https://www.gohacking.com/wp-content/uploads/2015/02/learn-how-to-hack-735x400.jpg",
 #                  title = "Hack",
 #                  price = 350000000)
@@ -56,6 +60,20 @@ def image(image_name):
 def about():
     return "Hi, welcome to Zipo's page"
 
+@app.route("/register", methods=["GET", "POST"])
+def register():
+    if request.method == "GET":
+        return render_template("login.html")
+    elif request.method == "POST":
+        form = request.form
+        username = form["username"]
+        password = form["password"]
+
+        new_account = Account(username = username,
+                              password = password)
+
+        new_account.save()
+        return redirect(url_for("index"))
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -66,7 +84,7 @@ def login():
         username = form["username"]
         password = form["password"]
 
-        if username == "admin" and password == "admin":
+        if username == "username" and password == "password":
             session["logged_in"] = True
 
             return redirect(url_for("index"))
