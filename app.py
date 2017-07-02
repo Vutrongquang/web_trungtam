@@ -8,10 +8,12 @@ app = Flask(__name__)
 mlab.connect()
 
 app.config["IMG_PATH"] = os.path.join(app.root_path, "images")
+app.secret_key = "Super"
 
 class Course(Document):
     image = StringField()
     title = StringField()
+    content = StringField()
     price = FloatField()
 
 # course1 = Course(image = "https://www.gohacking.com/wp-content/uploads/2015/02/learn-how-to-hack-735x400.jpg",
@@ -20,27 +22,27 @@ class Course(Document):
 
 # course1.save()
 
-image = "http://hourofcode.vn/wp-content/uploads/2015/10/HOUROFCODE.VN_.jpg"
-title = "Hour of code"
-price = 150000000
-
-courses  = [
-    {"image" : "http://hourofcode.vn/wp-content/uploads/2015/10/HOUROFCODE.VN_.jpg",
-     "title": "Hour of code",
-     "price": 150000000
-
-},
-    {"image" : "https://lh3.googleusercontent.com/4bv-VZSXu2vJyhNQaeU5Uq4tGWTq7s1qwJQfKU4JhGvkmNEyFSKwSrKdekcpXHjIFiTQ=h556",
-     "title": "Code",
-     "price": 250000000
-    },
-
-    {"image" : "https://www.gohacking.com/wp-content/uploads/2015/02/learn-how-to-hack-735x400.jpg",
-     "title": "Hack",
-     "price": 350000000
-
-
-    }]
+# image = "http://hourofcode.vn/wp-content/uploads/2015/10/HOUROFCODE.VN_.jpg"
+# title = "Hour of code"
+# price = 150000000
+#
+# courses  = [
+#     {"image" : "http://hourofcode.vn/wp-content/uploads/2015/10/HOUROFCODE.VN_.jpg",
+#      "title": "Hour of code",
+#      "price": 150000000
+#
+# },
+#     {"image" : "https://lh3.googleusercontent.com/4bv-VZSXu2vJyhNQaeU5Uq4tGWTq7s1qwJQfKU4JhGvkmNEyFSKwSrKdekcpXHjIFiTQ=h556",
+#      "title": "Code",
+#      "price": 250000000
+#     },
+#
+#     {"image" : "https://www.gohacking.com/wp-content/uploads/2015/02/learn-how-to-hack-735x400.jpg",
+#      "title": "Hack",
+#      "price": 350000000
+#
+#
+#     }]
 
 @app.route('/')
 def index():
@@ -55,29 +57,59 @@ def about():
     return "Hi, welcome to Zipo's page"
 
 
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    if request.method == "GET":
+        return render_template("login.html")
+    elif request.method == "POST":
+        form = request.form
+        username = form["username"]
+        password = form["password"]
+
+        if username == "admin" and password == "admin":
+            session["logged_in"] = True
+
+            return redirect(url_for("index"))
+
+
+        else:
+            return redirect(url_for("login"))
+
+@app.route("/logout")
+def logout():
+    session["logged_in"] = False
+    return (redirect(url_for("login")))
+
 @app.route("/add_course", methods=["GET","POST"])
 def add_course():
-    if request.method == "GET":
-        return render_template("add_course.html" )
-    elif request.method == "POST":
-        #1 Get data
+    if "logged_in" in session and session["logged_in"]:
 
-        form = request.form
-        title = form["title"]
-        price = form["price"]
+        if request.method == "GET":
+            return render_template("add_course.html" )
+        elif request.method == "POST":
+            #1 Get data
 
-        image = request.files["image"]
+            form = request.form
+            title = form["title"]
+            price = form["price"]
+            content = form["content"]
 
-        filename = secure_filename(image.filename)
+            image = request.files["image"]
 
-        image.save(os.path.join(app.config["IMG_PATH"], filename))
+            filename = secure_filename(image.filename)
 
-        #2 Save int
-        new_course = Course(title = title,
-                            image = "/images/{0}".format(filename),
-                            price = price)
-        new_course.save()
-        return redirect(url_for("index"))
+            image.save(os.path.join(app.config["IMG_PATH"], filename))
+
+            #2 Save int
+            new_course = Course(title = title,
+                                image = "/images/{0}".format(filename),
+                                price = price,
+                                content = content)
+            new_course.save()
+            return redirect(url_for("index"))
+    else:
+        return redirect(url_for("login"))
+
 
 @app.route("/users/<username>")
 def user(username):

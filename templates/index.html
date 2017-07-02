@@ -6,9 +6,16 @@
 </head>
 <body>
 
-<h1>My Zig's home - Nơi tụ tập của những kẻ lập dị</h1>
+<h1>My Zig's home - Nơi tụ tập của những kẻ lập dị muốn thay đổi cả thế giới </h1>
 
-<img src="/images/dancing.jpg" alt="">
+<p></p>
+
+{% for course in courses %}
+    <img src="{{ course.image }}" alt="">
+    <h3>Title:  {{ course.title }}</h3>
+    <p>Price: {{ course.price }}</p>
+    <p>Content: {{ course.content }}</p>
+{% endfor %}
 
 <a href="https://www.facebook.com/">Facebook</a>
 
@@ -17,12 +24,8 @@
 <a href="{{ url_for("add", a = 4, b =5) }}">bốn công năm bằng </a>
 
 
-{% for course in courses %}
-    <img src="{{ course.image }}" alt="">
-    <h3>{{ course.title }}</h3>
-    <p>{{ course.price }}</p>
 
-{% endfor %}
+
 
 </body>
 </html>
