@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Zig's Home</title>
+</head>
+<body>
+
+<h1>My Zig's home - Nơi tụ tập của những kẻ lập dị</h1>
+
+<img src="/images/dancing.jpg" alt="">
+
+<a href="https://www.facebook.com/">Facebook</a>
+
+<a href="{{ url_for("about") }}">About</a>
+
+<a href="{{ url_for("add", a = 4, b =5) }}">bốn công năm bằng </a>
+
+
+{% for course in courses %}
+    <img src="{{ course.image }}" alt="">
+    <h3>{{ course.title }}</h3>
+    <p>{{ course.price }}</p>
+
+{% endfor %}
+
+</body>
+</html>
